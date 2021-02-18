@@ -4,6 +4,8 @@
 #include <time.h>//to estimate the runing time
 #include "adjarray.h"
 #include <stdbool.h>
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
 
 //#define NLINKS 100000000000 //maximum number of edges for memory allocation, will increase if needed
 
@@ -14,6 +16,12 @@ struct Queue {
 	unsigned capacity; 
 	int* array; 
 }; 
+
+typedef struct {
+	unsigned long int maxDist;
+	unsigned long int furtherPoint;
+} pointDistance;
+
 
 // function to create a queue 
 // of given capacity. 
@@ -90,44 +98,66 @@ int rear(struct Queue* queue)
 
 
 //compute BFS algorithm
-int BFSlower(adjlist* g, int s) {
-    printf("debut");
-    int nbNodes = g->n;   
-    
-    //int distance[nbNodes];
-    // bool visited[nbNodes];
+pointDistance * BFSlower(adjlist* g, int s) {
+    unsigned long int nbNodes = g->n;   
     bool *visited = malloc((g->n+1)*sizeof(bool));
-    int *distance = malloc((g->n+1)*sizeof(int));
-    
-    for (int i = 0; i < nbNodes; i++)
+    unsigned long int *distance = malloc((g->n+1)*sizeof(unsigned long int));
+    pointDistance* result= malloc(sizeof(pointDistance));
+    for (unsigned long int i = 0; i < nbNodes; i++)
     {
         visited[i]=0;
         distance[i]=0;
     }
     // file
     visited[s]=1;
-    printf("passage");
     struct Queue* queue = createQueue(nbNodes+1);
     enqueue(queue,s);
-    int maxDistance =0;
+	result->maxDist = 0;
+	result->furtherPoint = s;
     while (!isEmpty(queue)) {
-        int currentElement = dequeue(queue);
-        for (int i = g->cd[currentElement]; i < g->cd[currentElement + 1]; i++)
-            {int neigh = g->adj[i];
+        unsigned long int currentElement = dequeue(queue);
+        for (unsigned long int i = g->cd[currentElement]; i < g->cd[currentElement + 1]; i++)
+            {unsigned long int neigh = g->adj[i];
             if (!visited[neigh])
             {
                 visited[neigh] = 1;
                 enqueue(queue,neigh);
                 distance[neigh] = distance[currentElement] + 1;
-                if (distance[neigh]>maxDistance){
-                    maxDistance = distance[neigh];
+                if (distance[neigh]>result->maxDist){
+                    result->maxDist = distance[neigh];
+					result->furtherPoint = neigh;
                 }
             }            
         }        
     }
     free(visited);
     free(distance);
-    return maxDistance;
+    return result;
+}
+
+unsigned long int loopLowerBFS(adjlist* g){
+	//100 itérations dans la boucle
+	unsigned int nbIter;
+	nbIter = MIN(100, g->n);
+	unsigned long int * previous = malloc(nbIter*sizeof(unsigned long int));
+	unsigned long int dist = 0;
+	unsigned long int currentSommet = 1;
+	previous[0] = currentSommet;
+	for (int i = 0; i < nbIter; i++){
+		pointDistance * maxDistance = BFSlower(g, currentSommet);
+		if (maxDistance->maxDist > dist){
+			dist = maxDistance->maxDist;
+		}
+		currentSommet = maxDistance->furtherPoint;
+		free(maxDistance);
+	}
+
+	free(previous);
+	return dist;
+}
+
+void free_pointDistance(pointDistance *g){
+	free(g);
 }
 
 
@@ -142,10 +172,16 @@ int main(int argc,char** argv){
 
 	printf("Building the adjacency list\n");
 	mkadjlist(g);
-    int s = 1;
-    int maxDist = BFSlower(g, s);
-    printf("%d\n", maxDist);
+	time_t t1,t2;
+
+	t1=time(NULL);
+    unsigned long int maxDist = loopLowerBFS(g);
+    printf("%lu\n", maxDist);
+
 	free_adjlist(g);
+	t2=time(NULL);
+
+	printf("- Overall time = %ldh%ldm%lds\n",(t2-t1)/3600,((t2-t1)%3600)/60,((t2-t1)%60));
 
 	return 0;
 }
