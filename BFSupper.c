@@ -8,34 +8,6 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-/*void permuter(unsigned long int *a, unsigned long int *b) {
-    int tmp;
-    tmp = *a;
-    *a = *b;
-    *b = tmp;
-}
-void triRapid(unsigned long int tab[], unsigned long int rank[], unsigned long int first, unsigned long int last) {
-    unsigned long int pivot, i, j;
-    if(first < last) {
-        pivot = first;
-        i = first;
-        j = last;
-        while (i < j) {
-            while(tab[i] <= tab[pivot] && i < last)
-                i++;
-            while(tab[j] > tab[pivot])
-                j--;
-            if(i < j) {
-                permuter(&tab[i], &tab[j]);
-                permuter(&rank[i], &rank[j]);
-            }
-        }
-        permuter(&tab[pivot], &tab[j]);
-        permuter(&rank[pivot], &rank[j]);
-        triRapid(tab, rank, first, j - 1);
-        triRapid(tab, rank, j + 1, last);
-    }
-}*/
 
 void tri_rapide (unsigned long int **nbNeigh, unsigned long int **id, unsigned long int taille) {
     unsigned long int otherElement, currentElement;
@@ -62,50 +34,44 @@ void tri_rapide (unsigned long int **nbNeigh, unsigned long int **id, unsigned l
     tri_rapide(nbNeigh + otherElement - 1,  id, taille - otherElement + 1);
 }
 
-int compare_function(const void *a,const void *b) {
-int *x = (int *) a;
-int *y = (int *) b;
-return -(*x - *y);
-}
-
 struct Neigh {
     unsigned long int id;
     unsigned long int nbNeigh;
 };
 
+
+int compare (const void * a, const void * b)
+{
+    return ( (*(struct Neigh*)b).nbNeigh - (*(struct Neigh*)a).nbNeigh );
+}
+
 unsigned long int loopUpperBFS(adjlist* g){
-    //unsigned long int * nbNeigh = malloc((g->n+1)*sizeof(unsigned long int));
-    //unsigned long int * id = malloc((g->n+1)*sizeof(unsigned long int));
-    struct PlayerScore ps[N]
+    struct Neigh * neigh = (struct Neigh *)malloc((g->n+1)*sizeof(struct Neigh));
     unsigned long int maxMinDist = 0;
     unsigned long int nbNodes = g->n;
-    // pointDistance * maxDistance = malloc(sizeof(pointDistance));
+    pointDistance * maxDistance = malloc(sizeof(pointDistance));
     ///récupère nombre de voisins par noeud
     for (unsigned long int i = 0; i < g->n; i++)
     {
-        id[i]=i;
-        nbNeigh[i]=g->cd[i+1]-g->cd[i];
+        neigh[i].id=i;
+        neigh[i].nbNeigh=g->cd[i+1]-g->cd[i];
     }
     // tri de la liste
     //triRapid(nbNeigh, id, 0, g->n -1);
-    qsort(nbNeigh,nbNodes,sizeof(unsigned long int),compare_function);
+    qsort(neigh,nbNodes,sizeof(struct Neigh),compare);
     // qsort(nbNeigh, id, nbNodes);
     printf("fin du tri");
-    printf("nbNeigh %lu\n", nbNeigh[0]);
-    printf("nbNeigh %lu\n", nbNeigh[1]);
-    printf("nbNeigh %lu\n", nbNeigh[2]);
     // on prend les 100 qui ont le plus de voisins
-    // int nbIter = MIN(100, g->n - 1);
-    /*for ( int i = 0; i < nbIter; i++)
+    int nbIter = MIN(100, g->n - 1);
+    for ( int i = 0; i < nbIter; i++)
     {
-        maxDistance = BFSlower(g, id[i]);
+        maxDistance = BFSlower(g, neigh[i].id);
         if (maxDistance->maxDist>maxMinDist){
             maxMinDist = maxDistance->maxDist;
         }
-    }  */ 
-    free(id);
-    free(nbNeigh);
-    // free(maxDistance);
+    }
+    free(neigh);
+    free(maxDistance);
     return maxMinDist;
 }
 
