@@ -74,7 +74,7 @@ triangleList * getTriangleList(adjlist * g){
     triList -> tri = malloc(e1*sizeof(triangle));
     triList->nbTri=0;
     // sort la liste par noeud
-    /*for (int i = 0; i < g->n; i++)
+    for (int i = 0; i < g->n; i++)
     {
         if(g->cd[i+1]-g->cd[i] > 1){
             qsort(&g->adj[g->cd[i]], g->cd[i+1]-g->cd[i], sizeof(&g->adj[g->cd[1]]), compare);
@@ -90,22 +90,46 @@ triangleList * getTriangleList(adjlist * g){
                 // calcul de l'intersection
                 //int jparc = 0;
                 //int kparc = 0;
-                for (int i = k - g->cd[j]; i < g->cd[j+1]-g->cd[j]; i++){
-                    for (int l=0; l < g->cd[neigh+1]-g->cd[neigh]; l++){
+                if ((g->adj[g->cd[j]+g->cd[j+1]-g->cd[j]-1] >=  g->adj[g->cd[neigh]]) ||
+                (g->adj[g->cd[j]] <= g->adj[g->cd[neigh]+g->cd[neigh+1]-g->cd[neigh]-1])){
+                    int i = k - g->cd[j];
+                    int l = 0;
+                    while((i < g->cd[j+1]-g->cd[j]) && (l <g->cd[neigh+1]-g->cd[neigh])) {
                         if(g->adj[g->cd[j]+i]==g->adj[g->cd[neigh]+l]){
                             triList->tri[triList->nbTri].a = j;
                             triList->tri[triList->nbTri].b = neigh;
                             triList->tri[triList->nbTri].c = g->adj[g->cd[j]+i];
+                            // triList->nbTri++;
+                            //reallocate
+                            if (++(triList->nbTri)>e1/2) {//increase allocated RAM if needed
+			                    e1+=g->e;
+			                    triList->tri=realloc(triList->tri,e1*sizeof(edge));
+		                    }
+                            i++;
+                            l++;
+                        } else if (g->adj[g->cd[j]+i]<g->adj[g->cd[neigh]+l]){
+                            i++;
+                        } else {
+                            l++;
+                        }
+                    }
+                /*for (int i = k - g->cd[j]; i < g->cd[j+1]-g->cd[j]; i++){
+                    for (int l=0; l < g->cd[neigh+1]-g->cd[neigh]; l++){
+                        if(g->adj[g->cd[j]+i]==g->adj[g->cd[neigh]+l]){
+                            //triList->tri[triList->nbTri].a = j;
+                            //triList->tri[triList->nbTri].b = neigh;
+                            //triList->tri[triList->nbTri].c = g->adj[g->cd[j]+i];
                             triList->nbTri++;
                         }
                     }
+                }*/
                 }
 
             }
             
         }
         
-    }*/
+    }
     
 
    
