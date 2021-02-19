@@ -120,13 +120,12 @@ void sortList() {
             return;
         }
         else {
-            while(current != NULL) {
+            while(current != NULL ) {
                 //Node index will point to node next to current
                 index = current->next;
-
                 while(index != NULL) {
                     //If current node's data is greater than index's node data, swap the data between them
-                    if(current->data > index->data) {
+                    if(current->data > index->data ) {
                         temp = current->data;
                         current->data = index->data;
                         index->data = temp;
@@ -162,6 +161,7 @@ void sortList() {
 	                }
 	                current = current->next;
 	            }
+
 	        }
 	    }
     //display() will display all the nodes present in the list
@@ -181,7 +181,6 @@ void sortList() {
     }
     struct queue* TSI (adjlist* G, unsigned long i) {
         //Node current will point to head
-        //struct node *head, *tail = NULL;
         head = NULL;
         tail = NULL;
         int e = 0;
@@ -194,21 +193,23 @@ void sortList() {
         //printf("Original list: \n");
         //display();
         //sortList();
-		sortList_(G);
+				//sortList_(G);
+				struct node *curr = head;
+				while(curr!=NULL & head->data < i){
+					head = curr->next;
+					curr = curr->next;
+				}
         //printf("Sorted list: \n");
         //display();
         int *list = malloc((e+1)*sizeof(int));
         struct node *current = head;
-        if(head == NULL) {
-            printf("List is empty \n");
-            return 0;
-        }
-		int N = G->n;
+				int N = G->n;
         struct queue* queue = create_queue(N+1);
+
         while(current != NULL) {
             //Prints each node by incrementing pointer
             //printf("%d ", current->data);
-			enqueue(queue,current->data);
+						enqueue(queue,current->data);
             current = current->next;
 
         }
@@ -217,6 +218,7 @@ void sortList() {
 
 struct queue* inter_list(struct queue* q1, struct queue* q2){
 	int s;
+
 	if (q1->size<q2->size){
 		s = q1->size;
 	}
@@ -240,14 +242,17 @@ void TRList(adjlist* G){
     for (int i=0;i<G->e;i++){
         struct queue* TSI_U = TSI (G, G->edges[i].s);
         struct queue* TSI_V = TSI (G, G->edges[i].t);
-		struct queue* W = inter_list(TSI_U, TSI_V);
-		for (int j=0; j<W->size;j++){
-			struct triangle tr = get_triangle(G->edges[i].s, G->edges[i].t, W->elements[j]);
-			display_triangle(tr);
-		}
-        free(TSI_U);
-        free(TSI_V);
-		free(W);
+				if((!isEmpty(TSI_U))&(!isEmpty(TSI_V))){
+					struct queue* W = inter_list(TSI_U, TSI_V);
+					for (int j=0; j<W->size;j++){
+							struct triangle tr = get_triangle(G->edges[i].s, G->edges[i].t, W->elements[j]);
+							display_triangle(tr);
+					}
+					free(TSI_U);
+					free(TSI_V);
+					free(W);
+
+				}
     }
 
 }
