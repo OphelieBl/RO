@@ -138,7 +138,7 @@ pointDistance * BFSlower(adjlist* g, int s) {
 unsigned long int loopLowerBFS(adjlist* g){
 	//100 itérations dans la boucle
 	unsigned int nbIter;
-	nbIter = MIN(200, g->n - 1);
+	nbIter = MIN(100, g->n - 1);
 	bool * treated = malloc((g->n+1)*sizeof(bool));
 	for (int i = 0; i < g->n+1; i++){
 		treated[i]=0;
