@@ -4,6 +4,23 @@
 #include <time.h>//to estimate the runing time
 #include "edgelist.h"
 
+struct website {
+    unsigned long int id;
+    long double probability;
+};
+
+
+int compareProba (const void * a, const void * b)
+{
+    if ((*(struct website*)b).probability - (*(struct website*)a).probability >0) {
+        return 1;
+    } else if ((*(struct website*)b).probability - (*(struct website*)a).probability <0){
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
 long double *PageRank(edgelist * g, float alpha, int nb_iter){
     unsigned long int nbNodes = g->n;
     unsigned long int nbEdges = g->e;
@@ -57,22 +74,47 @@ long double *PageRank(edgelist * g, float alpha, int nb_iter){
         }
         free(pt);
     }
-    FILE* fichier = NULL;
+    //écriture dans un fichier pour tracer
+    /*FILE* fichier = NULL;
  
-    fichier = fopen("alpha015.txt", "w");
+    fichier = fopen("din.txt", "w");
  
     if (fichier != NULL)
     {
         for (unsigned long int i = 0; i < nbNodes; i++)
         {
             // si au moins un lien entre ou sort du noeud
-            if(dout[i]+din[i]!=0){
-                fprintf(fichier, "%Lf\n", proba[i]);
+            if(dout[i]+din[i]>0.5){
+                fprintf(fichier, "%u\n", din[i]);
             }
         }
         fclose(fichier);
+    }*/
+    // récupérer les probas des plus importants
+    struct website * webSites = (struct website *)malloc((nbLinkedNodes)*sizeof(struct website));
+    int j = 0;
+    for (unsigned long int i = 0; i < g->n; i++)
+    {
+        if(dout[i]+din[i]>0.5){
+            webSites[j].id=i;
+            webSites[j].probability=proba[i];
+            j=j+1;
+        }
     }
+    // tri de la liste
+    qsort(webSites, nbLinkedNodes, sizeof( struct website), compareProba);
+    printf("minProba %LF %lu\n", webSites[0].probability, webSites[0].id);
+    printf("minProba %LF %lu\n", webSites[1].probability, webSites[1].id);
+    printf("minProba %LF %lu\n", webSites[2].probability, webSites[2].id);
+    printf("minProba %LF %lu\n", webSites[3].probability, webSites[3].id);
+    printf("minProba %LF %lu\n", webSites[4].probability, webSites[4].id);
+    printf("maxProba %LF %lu\n", webSites[nbLinkedNodes - 1].probability, webSites[nbLinkedNodes - 1].id);
+    printf("maxProba %LF %lu\n", webSites[nbLinkedNodes - 2].probability, webSites[nbLinkedNodes - 2].id);
+    printf("maxProba %LF %lu\n", webSites[nbLinkedNodes - 3].probability, webSites[nbLinkedNodes - 3].id);
+    printf("maxProba %LF %lu\n", webSites[nbLinkedNodes - 4].probability, webSites[nbLinkedNodes - 4].id);
+    printf("maxProba %LF %lu\n", webSites[nbLinkedNodes - 5].probability, webSites[nbLinkedNodes - 5].id);
 
+    free(webSites);
     free(dout);
     free(din);
     return proba;  
