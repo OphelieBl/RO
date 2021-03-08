@@ -77,7 +77,7 @@ long double *PageRank(edgelist * g, float alpha, int nb_iter){
     //écriture dans un fichier pour tracer
     /*FILE* fichier = NULL;
  
-    fichier = fopen("din.txt", "w");
+    fichier = fopen("alpha2.txt", "w");
  
     if (fichier != NULL)
     {
@@ -85,7 +85,7 @@ long double *PageRank(edgelist * g, float alpha, int nb_iter){
         {
             // si au moins un lien entre ou sort du noeud
             if(dout[i]+din[i]>0.5){
-                fprintf(fichier, "%u\n", din[i]);
+                fprintf(fichier, "%.10LF\n", proba[i]);
             }
         }
         fclose(fichier);
@@ -112,7 +112,7 @@ long double *PageRank(edgelist * g, float alpha, int nb_iter){
     printf("maxProba %LF %lu\n", webSites[nbLinkedNodes - 2].probability, webSites[nbLinkedNodes - 2].id);
     printf("maxProba %LF %lu\n", webSites[nbLinkedNodes - 3].probability, webSites[nbLinkedNodes - 3].id);
     printf("maxProba %LF %lu\n", webSites[nbLinkedNodes - 4].probability, webSites[nbLinkedNodes - 4].id);
-    printf("maxProba %LF %lu\n", webSites[nbLinkedNodes - 5].probability, webSites[nbLinkedNodes - 5].id);
+    printf("maxProba %.10LF %lu\n", webSites[nbLinkedNodes - 5].probability, webSites[nbLinkedNodes - 5].id);
 
     free(webSites);
     free(dout);
